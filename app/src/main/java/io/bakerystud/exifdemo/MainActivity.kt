@@ -8,7 +8,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
@@ -18,7 +17,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_code.*
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
@@ -98,8 +96,10 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
     }
 
     private fun onDownloadFinished(photos: List<PhotoRecord>) {
-        Timber.d("onDownloadFinished $photos")
-        showSnackbar(photos[0].toString())
+        (currentFragment() as EnterCodeFragment).progressVisible(false)
+        router.navigateTo(Screens.eventsList)
+        Timber.d("onDownloadFinished")
+        DataStorage.subject.onNext(photos)
     }
 
     private fun onUploadFinished() {

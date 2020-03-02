@@ -1,5 +1,8 @@
 package io.bakerystud.exifdemo
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context.CLIPBOARD_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +32,14 @@ class EnterCodeFragment : Fragment() {
             progressVisible(true)
             controller.onNextClicked(editCode.text.toString())
         }
+        textYourCode.setOnClickListener {
+            val clipboardManager =
+                requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+            val clipData = ClipData.newPlainText("Source Text", textYourCode.text.toString())
+            clipboardManager?.setPrimaryClip(clipData)
+            activity?.showSnackbar("Copied to clipboard")
+        }
+
     }
 
     fun progressVisible(visible: Boolean) {

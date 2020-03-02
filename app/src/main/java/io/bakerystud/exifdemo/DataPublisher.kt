@@ -24,7 +24,6 @@ class DataPublisher(private val context: Context,
         records.forEach {
             val (record, name) = it
             database.child(deviceId).child(name).setValue(record)
-            Timber.d("publish uploaded $name")
         }
         Timber.d("publish finished")
     }

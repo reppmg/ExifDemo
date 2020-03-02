@@ -7,7 +7,7 @@ object Screens {
     val enterCode: FragmentScreen
         get() = FragmentScreen(EnterCodeFragment())
     val eventsList: FragmentScreen
-        get() = FragmentScreen(EnterCodeFragment())
+        get() = FragmentScreen(EventsListFragment())
 }
 
 open class FragmentScreen(private val screenFragment: Fragment) : SupportAppScreen() {

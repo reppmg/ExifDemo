@@ -36,14 +36,18 @@ class EnterCodeFragment : Fragment() {
             progressVisible(true)
             controller.onNextClicked(editCode.text.toString())
         }
-        textYourCode.setOnClickListener {
-            val clipboardManager =
-                requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
-            val clipData = ClipData.newPlainText("Source Text", textYourCode.text.toString())
-            clipboardManager?.setPrimaryClip(clipData)
-            activity?.showSnackbar("Copied to clipboard")
-        }
+        textYourCode.setOnClickListener { copyClipboard() }
+        textLabelCode.setOnClickListener { copyClipboard() }
+        textHintCode.setOnClickListener { copyClipboard() }
 
+    }
+
+    private fun copyClipboard() {
+        val clipboardManager =
+            requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+        val clipData = ClipData.newPlainText("Source Text", textYourCode.text.toString())
+        clipboardManager?.setPrimaryClip(clipData)
+        activity?.showSnackbar("Copied to clipboard")
     }
 
     fun progressVisible(visible: Boolean) {

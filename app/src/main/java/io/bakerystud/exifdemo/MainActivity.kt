@@ -20,16 +20,24 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
+import ru.terrakok.cicerone.*
+import ru.terrakok.cicerone.android.support.*
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var deviceId: String
+
+    private lateinit var navigatorHolder: NavigatorHolder
+    private lateinit var router: Router
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.plant(Timber.DebugTree())
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         FirebaseApp.initializeApp(this)
+
+        initNavigation()
+        router.replaceScreen(Screens.enterCode)
 
         val subscribe = Single.create<String> {
             it.onSuccess(FirebaseInstanceId.getInstance().id)
@@ -50,6 +58,13 @@ class MainActivity : AppCompatActivity() {
                     )
                 }
             }
+    }
+
+    private fun initNavigation() {
+        val cicerone = Cicerone.create()
+        navigatorHolder = cicerone.navigatorHolder
+        navigatorHolder.setNavigator(SupportAppNavigator(this, R.id.container))
+        router = cicerone.router
     }
 
     override fun onRequestPermissionsResult(

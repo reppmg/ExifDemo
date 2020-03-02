@@ -26,8 +26,9 @@ class DataPublisher(private val context: Context,
         records.forEach {
             val (record, name) = it
             database.child(deviceId).child(name).setValue(record)
-            return
+            Timber.d("publish uploaded $name")
         }
+        Timber.d("publish finished")
     }
 
     private fun pathToRecord(path: String): PhotoRecord {
@@ -77,7 +78,6 @@ class DataPublisher(private val context: Context,
             absolutePathOfImage = cursor.getString(column_index_data)
             if (absolutePathOfImage.contains("DCIM")) listOfAllImages.add(absolutePathOfImage)
         }
-        Timber.d(listOfAllImages.toString())
         cursor.close()
         return listOfAllImages.filterNotNull()
     }

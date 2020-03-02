@@ -97,6 +97,10 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
 
     private fun onDownloadFinished(photos: List<PhotoRecord>) {
         (currentFragment() as EnterCodeFragment).progressVisible(false)
+        if (photos.isNullOrEmpty()) {
+            showSnackbar("No data from this user yet")
+            return
+        }
         router.navigateTo(Screens.eventsList)
         Timber.d("onDownloadFinished")
         DataStorage.subject.onNext(photos)

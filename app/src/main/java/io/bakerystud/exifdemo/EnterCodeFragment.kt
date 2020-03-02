@@ -29,6 +29,10 @@ class EnterCodeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         buttonStart.setOnClickListener {
+            if (editCode.text.length < 3) {
+                activity?.showSnackbar("Code is too short")
+                return@setOnClickListener
+            }
             progressVisible(true)
             controller.onNextClicked(editCode.text.toString())
         }

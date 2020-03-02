@@ -11,7 +11,6 @@ class DataFetcher {
 
     fun fetch(code: String): Single<List<PhotoRecord>> {
         return Single.create<List<PhotoRecord>> { emitter ->
-            Thread.sleep(4000)
             val reference = database.getReference(code).addListenerForSingleValueEvent(object :
                 ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {

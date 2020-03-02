@@ -36,6 +36,10 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-database:19.2.1'
     implementation 'com.google.firebase:firebase-analytics:17.2.3'
+
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    implementation "androidx.exifinterface:exifinterface:1.1.0"
 }
 
 apply plugin: 'com.google.gms.google-services'

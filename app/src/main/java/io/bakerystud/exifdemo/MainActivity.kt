@@ -5,25 +5,27 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseApp
 import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.Completable
-import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_code.*
+import ru.terrakok.cicerone.Cicerone
+import ru.terrakok.cicerone.NavigatorHolder
+import ru.terrakok.cicerone.Router
+import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import timber.log.Timber
-import ru.terrakok.cicerone.*
-import ru.terrakok.cicerone.android.support.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController {
 
     lateinit var deviceId: String
 
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { deviceId ->
                 this.deviceId = deviceId
+                (currentFragment() as EnterCodeFragment).showCode(deviceId)
                 if (Build.VERSION.SDK_INT < 23 || PermissionChecker.checkSelfPermission(
                         this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -89,17 +92,47 @@ class MainActivity : AppCompatActivity() {
         val subscribe = Completable.create {
             DataPublisher(this, deviceId).publish()
             it.onComplete()
-        }.subscribeOn(Schedulers.computation())
+        }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(this::onUploadFinished)
+    }
+
+    private fun onDownloadFinished(photos: List<PhotoRecord>) {
+        Timber.d("onDownloadFinished $photos")
+        showSnackbar(photos[0].toString())
     }
 
     private fun onUploadFinished() {
         showSnackbar("Upload complete")
     }
+
+    override fun onNextClicked(code: String) {
+        val download = DataFetcher().fetch(code)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(this::onDownloadFinished, this::onFetchError)
+    }
+
+    private fun onFetchError(error: Throwable?) {
+        Timber.e(error)
+        showSnackbar("Error fetching data: ${error?.message}")
+        (currentFragment() as EnterCodeFragment).progressVisible(false)
+    }
 }
+
 fun Activity.showSnackbar(message: String?, short: Boolean = true) {
     message ?: return
     val duration = if (short) Snackbar.LENGTH_SHORT else Snackbar.LENGTH_LONG
     Snackbar.make(this.findViewById(android.R.id.content), message, duration).show()
+}
+
+
+fun FragmentActivity.currentFragment(): Fragment? {
+    val fragmentManager = this.supportFragmentManager
+    val fragments = fragmentManager.fragments
+    for (fragment in fragments) {
+        if (fragment != null && fragment.isVisible)
+            return fragment
+    }
+    return null
 }

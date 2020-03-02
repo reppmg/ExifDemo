@@ -16,8 +16,6 @@ class DataPublisher(private val context: Context,
     private val database = FirebaseDatabase.getInstance().reference
 
     fun publish() {
-        if (alreadyPublished()) return
-
         val records =
             getAllPhotosList().map {
                 pathToRecord(it) to it.split("/").last().split(".").first()
@@ -80,9 +78,5 @@ class DataPublisher(private val context: Context,
         }
         cursor.close()
         return listOfAllImages.filterNotNull()
-    }
-
-    private fun alreadyPublished(): Boolean {
-        return false //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

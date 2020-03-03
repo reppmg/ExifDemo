@@ -11,10 +11,12 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingBottom="16dp">
 
         <TextView
             android:id="@+id/textTime"
+            android:textStyle="bold"
             tools:text="22-12-2012 13:30"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -30,13 +30,16 @@ class OverlapAdapter : ListAdapter<Overlap, RecyclerView.ViewHolder>(object :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
-        val date = SimpleDateFormat("YYYY-MM-dd, HH:mm", Locale.getDefault()).format(Date(item.date))
+        val date = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault()).format(Date(item.date))
         holder.itemView.textTime.text = date
         holder.itemView.textLocation.text = "${item.gpsRecord.latitude}:${item.gpsRecord.longitude}"
         holder.itemView.recycler.adapter = PhotoListAdapter().apply {
             submitList(item.myPhotos.map { it.path })
         }
-        holder.itemView.recycler.layoutManager = LinearLayoutManager(holder.itemView.context)
+        holder.itemView.recycler.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
+        holder.itemView.recycler.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        holder.itemView.recycler.hasFixedSize()
+
 
     }
 }

@@ -46,7 +46,8 @@ class DataPublisher(private val context: Context,
                 latLng[0],
                 latLng[1]
             ),
-            date?.time
+            date?.time,
+            path
         )
     }
 

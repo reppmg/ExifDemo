@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.core.CrashlyticsCore
 import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -22,6 +24,7 @@ import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import timber.log.Timber
+import java.lang.RuntimeException
 
 class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController {
 
@@ -41,7 +44,6 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
 
         val subscribe = Single.create<String> {
             it.onSuccess(FirebaseInstanceId.getInstance().id)
-            Thread.sleep(1000)
         }.subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { deviceId ->

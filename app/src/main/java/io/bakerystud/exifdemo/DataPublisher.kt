@@ -37,7 +37,7 @@ class DataPublisher(private val context: Context,
 
         val date =
             if (!timeString.isNullOrEmpty()) SimpleDateFormat(
-                "YYYY:MM:dd HH:mm:ss",
+                "yyyy:MM:dd HH:mm:ss",
                 Locale.getDefault()
             ).parse(timeString) else null
 

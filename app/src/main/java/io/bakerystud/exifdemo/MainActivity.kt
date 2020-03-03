@@ -41,11 +41,16 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
 
         val subscribe = Single.create<String> {
             it.onSuccess(FirebaseInstanceId.getInstance().id)
+            Thread.sleep(1000)
         }.subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { deviceId ->
                 this.deviceId = deviceId
-                (currentFragment() as EnterCodeFragment).showCode(deviceId)
+                val fragmentManager = this.supportFragmentManager
+                val fragments = fragmentManager.fragments
+                for (fragment in fragments) {
+                    (fragment as? EnterCodeFragment)?.showCode(deviceId)
+                }
                 if (Build.VERSION.SDK_INT < 23 || PermissionChecker.checkSelfPermission(
                         this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -101,9 +106,9 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
             showSnackbar("No data from this user yet")
             return
         }
+        DataStorage.frenPhotos.onNext(photos)
         router.navigateTo(Screens.eventsList)
         Timber.d("onDownloadFinished")
-        DataStorage.frenPhotos.onNext(photos)
     }
 
     private fun onUploadFinished() {

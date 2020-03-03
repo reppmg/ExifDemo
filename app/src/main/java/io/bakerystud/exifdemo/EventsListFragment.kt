@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_list.*
 
 class EventsListFragment : Fragment() {
@@ -30,6 +31,7 @@ class EventsListFragment : Fragment() {
                 textNoOverlaps.isVisible = true
             } else {
                 textNoOverlaps.isVisible = false
+                recyclerOverlaps.layoutManager = LinearLayoutManager(requireContext())
                 recyclerOverlaps.adapter = OverlapAdapter().apply {
                     submitList(overlaps)
                 }

@@ -55,7 +55,10 @@ class EnterCodeFragment : Fragment() {
     }
 
     fun showCode(code: String) {
-        textYourCode.text = code
+        try {
+            textYourCode.text = code
+        } catch (e: Exception) {
+        }
     }
 
 }

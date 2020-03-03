@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.fragment_list.*
 import kotlinx.android.synthetic.main.item_overlap.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,6 +36,8 @@ class OverlapAdapter : ListAdapter<Overlap, RecyclerView.ViewHolder>(object :
         holder.itemView.recycler.adapter = PhotoListAdapter().apply {
             submitList(item.myPhotos.map { it.path })
         }
+        holder.itemView.recycler.layoutManager = LinearLayoutManager(holder.itemView.context)
+
     }
 }
 

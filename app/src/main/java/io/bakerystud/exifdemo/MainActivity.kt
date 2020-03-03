@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
         }
         router.navigateTo(Screens.eventsList)
         Timber.d("onDownloadFinished")
-        DataStorage.subject.onNext(photos)
+        DataStorage.frenPhotos.onNext(photos)
     }
 
     private fun onUploadFinished() {

@@ -6,22 +6,24 @@ const val TIME_THRESHOLD = 2 * 60 * 60 * 1000L //in millis
 const val DISTANCE_THRESHOLD = 50 //in meters
 
 class OverlapFinder(
-    myPhotos: List<PhotoRecord>,
+    myPhotos: List<PhotoRecord>?,
     frenPhotos: List<PhotoRecord>
 ) {
     private val myPhotos = transformList(myPhotos)
     private val frenPhotos = transformList(frenPhotos)
 
-    private fun transformList(target: List<PhotoRecord>): List<Photo> = target.filter {
+    private fun transformList(target: List<PhotoRecord>?): List<Photo>? = target?.filter {
         it.time != null && it.gps != null && it.path != null && !it.gps.nullsInside()
-    }.map {
+    }?.map {
         Photo(Location("").apply {
             latitude = it.gps!!.latitude!!
             longitude = it.gps.longitude!!
         }, it.time!!, it.path!!)
-    }.sortedBy { it.time }
+    }?.sortedBy { it.time }
 
     fun findOverlaps(): List<Overlap> {
+        frenPhotos ?: return emptyList()
+        myPhotos ?: return emptyList()
         val allOverlaps = ArrayList<Overlap>()
         for (frenPhoto in frenPhotos) {
             val candidatesByTime = filterTime(frenPhoto)
@@ -65,7 +67,7 @@ class OverlapFinder(
     ) = one.gps.distanceTo(two.gps) < DISTANCE_THRESHOLD
 
     private fun filterTime(target: Photo): List<Photo> {
-        return myPhotos.filter {
+        return myPhotos!!.filter {
             closeTime(target, it)
         }
     }

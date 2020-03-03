@@ -25,6 +25,7 @@ class DataPublisher(private val context: Context,
             val (record, name) = it
             database.child(deviceId).child(name).setValue(record)
         }
+        DataStorage.myPhotos.onNext(records.map { it.first })
         Timber.d("publish finished")
     }
 

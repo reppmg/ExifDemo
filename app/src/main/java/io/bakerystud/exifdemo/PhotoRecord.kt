@@ -6,7 +6,8 @@ import com.google.firebase.database.IgnoreExtraProperties
 @IgnoreExtraProperties
 data class PhotoRecord(
     val gps: GpsRecord? = null,
-    val time: Long? = null
+    val time: Long? = null,
+    val path: String? = null
 ) {
     @Exclude
     fun toMap(): Map<String, Any?> {

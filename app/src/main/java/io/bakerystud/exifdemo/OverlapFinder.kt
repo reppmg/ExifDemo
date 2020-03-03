@@ -14,7 +14,11 @@ class OverlapFinder(
 
     private fun transformList(target: List<PhotoRecord>?): List<Photo>? = target?.filter {
         it.time != null && it.gps != null && it.path != null && !it.gps.nullsInside()
-    }?.map {
+    }?.filter {
+        it.gps!!.latitude != 0.0 && it.gps.longitude != 0.0
+    }
+
+        ?.map {
         Photo(Location("").apply {
             latitude = it.gps!!.latitude!!
             longitude = it.gps.longitude!!

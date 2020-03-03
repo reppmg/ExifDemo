@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
             return
         }
         DataStorage.frenPhotos.onNext(photos)
-        router.navigateTo(Screens.eventsList)
+        router.replaceScreen(Screens.eventsList)
         Timber.d("onDownloadFinished")
     }
 

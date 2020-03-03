@@ -54,6 +54,16 @@
         app:layout_constraintVertical_bias="0.55" />
 
     <ImageButton
+        android:id="@+id/buttonPaste"
+        android:layout_marginEnd="16dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_button_paste"
+        app:layout_constraintBottom_toBottomOf="@+id/editCode"
+        app:layout_constraintEnd_toStartOf="@+id/editCode"
+        app:layout_constraintTop_toTopOf="@+id/editCode" />
+
+    <ImageButton
         android:id="@+id/buttonStart"
         android:layout_width="64dp"
         android:layout_height="64dp"

@@ -4,6 +4,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +41,7 @@ class EnterCodeFragment : Fragment() {
         textYourCode.setOnClickListener { copyClipboard() }
         textLabelCode.setOnClickListener { copyClipboard() }
         textHintCode.setOnClickListener { copyClipboard() }
-
+        buttonPaste.setOnClickListener { pasteFromClipboard() }
     }
 
     private fun copyClipboard() {
@@ -48,6 +50,18 @@ class EnterCodeFragment : Fragment() {
         val clipData = ClipData.newPlainText("Source Text", textYourCode.text.toString())
         clipboardManager?.setPrimaryClip(clipData)
         activity?.showSnackbar("Copied to clipboard")
+    }
+
+    private fun pasteFromClipboard() {
+        val clipboardManager =
+            requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+        try {
+            clipboardManager?.primaryClip?.getItemAt(0)?.text?.let {
+                editCode.text = SpannableStringBuilder(it)
+            }
+        } catch (e: Exception) {
+        }
+
     }
 
     fun progressVisible(visible: Boolean) {

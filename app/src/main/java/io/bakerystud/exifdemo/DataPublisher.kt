@@ -4,23 +4,28 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Base64
 import androidx.exifinterface.media.ExifInterface
 import com.google.firebase.database.FirebaseDatabase
 import timber.log.Timber
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class DataPublisher(private val context: Context,
-                    private val deviceId: String) {
+class DataPublisher(
+    private val context: Context,
+    private val deviceId: String
+) {
     private val database = FirebaseDatabase.getInstance().reference
 
     fun publish() {
-        val records =
-            getAllPhotosList().map {
-                pathToRecord(it) to it.split("/").last().split(".").first()
+        val records: List<Pair<PhotoRecord, String>> =
+            getAllPhotosList().mapNotNull {
+                pathToRecord(it)
+            }.map {
+                it to it.path!!.split("/").last().split(".").first()
             }
-
         records.forEach {
             val (record, name) = it
             database.child(deviceId).child(name).setValue(record)
@@ -29,26 +34,40 @@ class DataPublisher(private val context: Context,
         Timber.d("publish finished")
     }
 
-    private fun pathToRecord(path: String): PhotoRecord {
-        val exif = ExifInterface(path)
-        val timeString =
-            exif.getAttribute(android.media.ExifInterface.TAG_DATETIME)
-        val latLng = exif.latLong ?: doubleArrayOf(0.0, 0.0)
+    private fun uploadLastFile(records: List<Pair<PhotoRecord, String>>) {
+        val record = records.last().first
+        val path = record.path!!
+        val file = File(path)
+        val bytes = file.readBytes()
+        val base64string = Base64.encodeToString(bytes, Base64.DEFAULT)
+        database.child(deviceId).child(path.split("/").last().split(".").first())
+            .setValue(base64string)
+    }
 
-        val date =
-            if (!timeString.isNullOrEmpty()) SimpleDateFormat(
-                "yyyy:MM:dd HH:mm:ss",
-                Locale.getDefault()
-            ).parse(timeString) else null
+    private fun pathToRecord(path: String): PhotoRecord? {
+        try {
+            val exif = ExifInterface(path)
+            val timeString =
+                exif.getAttribute(android.media.ExifInterface.TAG_DATETIME)
+            val latLng = exif.latLong ?: doubleArrayOf(0.0, 0.0)
 
-        return PhotoRecord(
-            GpsRecord(
-                latLng[0],
-                latLng[1]
-            ),
-            date?.time,
-            path
-        )
+            val date =
+                if (!timeString.isNullOrEmpty()) SimpleDateFormat(
+                    "yyyy:MM:dd HH:mm:ss",
+                    Locale.getDefault()
+                ).parse(timeString) else null
+
+            return PhotoRecord(
+                GpsRecord(
+                    latLng[0],
+                    latLng[1]
+                ),
+                date?.time,
+                path
+            )
+        } catch (e: Exception) {
+            return null
+        }
     }
 
     @SuppressLint("InlinedApi", "Recycle")

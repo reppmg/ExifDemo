@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.core.CrashlyticsCore
 import com.google.firebase.iid.FirebaseInstanceId
@@ -99,7 +100,15 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
             it.onComplete()
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(this::onUploadFinished)
+            .subscribe(this::onUploadFinished, {onError(it)})
+    }
+
+    private fun onError(error: Throwable?) {
+        Timber.e(error)
+        showSnackbar("Something went wrong: ${error?.message}")
+        FirebaseAnalytics.getInstance(this).logEvent("errorrrr", Bundle().apply {
+            putString("message", error?.message.toString())
+        })
     }
 
     private fun onDownloadFinished(photos: List<PhotoRecord>) {

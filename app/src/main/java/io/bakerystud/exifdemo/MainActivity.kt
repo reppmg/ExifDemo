@@ -8,24 +8,25 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker
+import androidx.core.view.forEach
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentStatePagerAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.crashlytics.core.CrashlyticsCore
 import com.google.firebase.iid.FirebaseInstanceId
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main.*
 import ru.terrakok.cicerone.Cicerone
 import ru.terrakok.cicerone.NavigatorHolder
 import ru.terrakok.cicerone.Router
 import ru.terrakok.cicerone.android.support.SupportAppNavigator
 import timber.log.Timber
-import java.lang.RuntimeException
 
 class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController {
 
@@ -41,7 +42,6 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
         FirebaseApp.initializeApp(this)
 
         initNavigation()
-        router.replaceScreen(Screens.enterCode)
 
         val subscribe = Single.create<String> {
             it.onSuccess(FirebaseInstanceId.getInstance().id)
@@ -67,6 +67,42 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
                     )
                 }
             }
+
+        initPagerAndNavigation()
+    }
+
+    private fun initPagerAndNavigation() {
+        pager.adapter = object : FragmentStatePagerAdapter(
+            supportFragmentManager,
+            BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+        ) {
+            private val fragments = listOf(
+                EnterCodeFragment(),
+                EventsListFragment(),
+                EnterCodeFragment()
+            )
+
+            override fun getItem(position: Int): Fragment = fragments[position]
+
+            override fun getCount(): Int = 3
+        }
+
+        pager.addOnPageChangeListener(OnPageSelectedListener { position ->
+            bottomBar.menu.forEach {
+                it.isChecked = false
+            }
+            bottomBar.menu[position].isChecked = true
+        })
+
+        bottomBar.inflateMenu(R.menu.navigation)
+        bottomBar.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.item_qr -> pager.currentItem = 0
+                R.id.item_events -> pager.currentItem = 1
+                R.id.item_friends_list -> pager.currentItem = 2
+            }
+            true
+        }
     }
 
     private fun initNavigation() {
@@ -100,7 +136,7 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
             it.onComplete()
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(this::onUploadFinished, {onError(it)})
+            .subscribe(this::onUploadFinished, this::onError)
     }
 
     private fun onError(error: Throwable?) {
@@ -118,7 +154,6 @@ class MainActivity : AppCompatActivity(), EnterCodeFragment.EnterCodeController 
             return
         }
         DataStorage.frenPhotos.onNext(photos)
-        router.replaceScreen(Screens.eventsList)
         Timber.d("onDownloadFinished")
     }
 
